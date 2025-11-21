@@ -67,7 +67,7 @@ The application uses the following hardcoded values:
 
 ## Project Structure
 Available Scripts
-bashnpm run dev      # Start development server
-npm run build    # Create production build
-npm run start    # Start production server
-npm run lint     # Run ESLint
+- bashnpm run dev      # Start development server
+- npm run build    # Create production build
+- npm run start    # Start production server
+- npm run lint     # Run ESLint
