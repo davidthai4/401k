@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ContributionChart } from "@/components/ContributionChart";
+import { calculateProjection, formatCurrency } from "@/lib/utils";
 
 export default function Home() {
   const [contributionType, setContributionType] = useState<"percent" | "fixed">("percent");
@@ -86,9 +88,11 @@ export default function Home() {
 
         {/* Main Content Grid */}
         <div className="grid gap-8 lg:grid-cols-12">
-          {/* Left Column - Contribution Form */}
+          
+          {/* LEFT COLUMN - Contribution Form + Employer Match */}
           <div className="lg:col-span-4 space-y-8">
-            {/* Contribution Form Card */}
+            
+            {/* CARD 1: Contribution Form */}
             <div className="rounded-3xl bg-stone-100/80 p-8 shadow-sm ring-1 ring-black/5">
               <h2 className="text-xl font-bold mb-6">Contribution</h2>
               
@@ -230,7 +234,7 @@ export default function Home() {
               </button>
             </div>
 
-            {/* 👇 EMPLOYER MATCH CARD - ADD THIS HERE 👇 */}
+            {/* CARD 2: Employer Match */}
             <div className="rounded-3xl bg-[var(--primary)] p-8 text-[var(--primary-foreground)] shadow-sm">
               <div className="mb-6 flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
@@ -262,20 +266,56 @@ export default function Home() {
               </div>
             </div>
 
-</div>
-          {/* Right Column - Chart Placeholder */}
+          </div>
+          {/* END OF LEFT COLUMN */}
+
+          {/* RIGHT COLUMN - Chart */}
           <div className="lg:col-span-8">
-            <div className="h-full rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
-              <h2 className="text-xl font-bold mb-4">Projected Growth</h2>
-              <p className="text-[var(--muted-foreground)] mb-8">
-                Based on 7% annual return
-              </p>
-              <div className="h-96 flex items-center justify-center border-2 border-dashed border-[var(--border)] rounded-lg">
-                <p className="text-[var(--muted-foreground)]">Chart coming in next step...</p>
+            <div className="h-full rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5 flex flex-col">
+              <div className="mb-8">
+                <h2 className="text-xl font-bold mb-2">Projected Growth</h2>
+                <p className="text-sm text-[var(--muted-foreground)]">
+                  Based on 7% annual return • Includes employer match
+                </p>
+              </div>
+              
+              {/* Chart Container */}
+              <div className="flex-1 min-h-[400px]">
+                <ContributionChart 
+                  contributionValue={contributionValue}
+                  contributionType={contributionType}
+                />
+              </div>
+
+              {/* Stats below chart */}
+              <div className="mt-6 grid grid-cols-3 gap-4 pt-6 border-t border-[var(--border)]">
+                <div>
+                  <div className="text-xs text-[var(--muted-foreground)] mb-1">Starting Balance</div>
+                  <div className="text-lg font-bold">{formatCurrency(142893)}</div>
+                </div>
+                <div>
+                  <div className="text-xs text-[var(--muted-foreground)] mb-1">10-Year Projection</div>
+                  <div className="text-lg font-bold">
+                    {formatCurrency(
+                      calculateProjection(contributionValue, contributionType)[10]?.amount || 0
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs text-[var(--muted-foreground)] mb-1">Total Growth</div>
+                  <div className="text-lg font-bold text-green-600">
+                    +{formatCurrency(
+                      (calculateProjection(contributionValue, contributionType)[10]?.amount || 0) - 142893
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          {/* END OF RIGHT COLUMN */}
+
         </div>
+        {/* END OF GRID */}
       </main>
     </div>
   );
