@@ -1,1 +1,63 @@
 @import "tailwindcss";
+
+:root {
+  --background: #F5F2E9;
+  --foreground: #1F2937;
+  --card: #FEFDFB;
+  --card-foreground: #1F2937;
+  --primary: #1F2937;
+  --primary-foreground: #F5F2E9;
+  --secondary: #E8E4D9;
+  --muted: #E8E4D9;
+  --muted-foreground: #6B7280;
+  --accent: #E8E4D9;
+  --border: #D4CFC0;
+  --input: #D4CFC0;
+  --ring: #1F2937;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Custom Slider Styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Slider thumb (the circle you drag) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #10b981;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #10b981;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
