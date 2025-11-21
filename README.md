@@ -1,8 +1,8 @@
-401k Contribution Calculator
+## 401k Contribution Calculator
 A Next.js application for managing 401k retirement contributions with real-time projections and employer match calculations.
 
 
-Features
+## Features
 - Toggle between percentage-based or fixed dollar amount contributions
 - Interactive slider with visual feedback for employer match optimization
 - Real-time 10-year growth projections with interactive charts
@@ -17,22 +17,22 @@ Tech Stack
 Quick Start
 Prerequisites
 
-Node.js 20.9.0 or higher
+- Node.js 20.9.0 or higher
 
-Installation & Setup
+## [Installation & Setup]
 
 Clone the repository:
 
-bashgit clone [<repository-url>](https://github.com/davidthai4/401k.git)
+bashgit clone https://github.com/davidthai4/401k.git
 cd 401k-app
 
-Install dependencies:
+Install dependencies
 
 run:
 
 bashnpm install
 
-Start the development server:
+Start the development server
 
 run: 
 
@@ -63,16 +63,9 @@ The application uses the following hardcoded values:
 - Employer Match: 50% up to 6% of salary
 - Projected Return: 7% annually
 
-## Project Structure
 ```
-401k-app/
-├── app/
-│   ├── api/contribution/route.ts    # API endpoints
-│   └── page.tsx                     # Main application page
-├── components/
-│   └── ContributionChart.tsx        # Chart component
-└── lib/
-    └── utils.ts                     # Calculation utilities
+
+## Project Structure
 Available Scripts
 bashnpm run dev      # Start development server
 npm run build    # Create production build
