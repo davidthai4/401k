@@ -3,12 +3,18 @@
 import { useState, useEffect } from "react";
 import { ContributionChart } from "@/components/ContributionChart";
 import { calculateProjection, formatCurrency } from "@/lib/utils";
+import { toast, Toaster } from "sonner";
 
 export default function Home() {
   const [contributionType, setContributionType] = useState<"percent" | "fixed">("percent");
-  const [contributionValue, setContributionValue] = useState(6);
+  const [percentValue, setPercentValue] = useState(6);
+  const [fixedValue, setFixedValue] = useState(500);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [ytdContribution, setYtdContribution] = useState(7200);
+
+  // Get the current value based on which mode we're in
+  const currentValue = contributionType === "percent" ? percentValue : fixedValue;
 
   // Fetch data on load
   useEffect(() => {
@@ -17,7 +23,15 @@ export default function Home() {
         const res = await fetch("/api/contribution");
         const data = await res.json();
         setContributionType(data.contributionType);
-        setContributionValue(data.contributionValue);
+        
+        // Set the appropriate value based on type
+        if (data.contributionType === "percent") {
+          setPercentValue(data.contributionValue);
+        } else {
+          setFixedValue(data.contributionValue);
+        }
+        
+        setYtdContribution(data.ytdContribution);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -31,17 +45,24 @@ export default function Home() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
+      const valueToSave = contributionType === "percent" ? percentValue : fixedValue;
+      
       await fetch("/api/contribution", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contributionType,
-          contributionValue,
+          contributionValue: valueToSave,
         }),
       });
-      alert("Contribution updated successfully!");
+      
+      toast.success("Contribution updated!", {
+        description: `Your ${contributionType === "percent" ? percentValue + "%" : "$" + fixedValue} contribution has been saved.`,
+      });
     } catch (error) {
-      alert("Failed to update contribution");
+      toast.error("Failed to update", {
+        description: "Please try again later.",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -61,7 +82,7 @@ export default function Home() {
       <nav className="container mx-auto flex items-center justify-between px-6 py-8">
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-[var(--primary)]"></div>
-          <div className="text-2xl font-bold tracking-tight">Moment</div>
+          <div className="text-2xl font-bold tracking-tight">Human Interest</div>
         </div>
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-[var(--muted-foreground)]">
@@ -73,17 +94,27 @@ export default function Home() {
 
       <main className="container mx-auto px-6 py-8">
         {/* Hero Section */}
-        <div className="mb-16">
-          <div className="mb-6 inline-flex items-center rounded-full bg-[var(--secondary)] px-4 py-1.5 text-sm font-medium">
-            <span className="mr-2 h-2 w-2 rounded-full bg-green-500"></span>
-            2025 Contribution Limits Updated
+        <div className="mb-16 md:flex md:items-end md:justify-between">
+          <div>
+            <div className="mb-6 inline-flex items-center rounded-full bg-[var(--secondary)] px-4 py-1.5 text-sm font-medium">
+              <span className="mr-2 h-2 w-2 rounded-full bg-green-500"></span>
+              2025 Contribution Limits Updated
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-2">
+              Your Retirement
+            </h1>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-[var(--muted-foreground)]">
+              is on track.
+            </h1>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-2">
-            Your Retirement
-          </h1>
-          <h1 className="text-4xl md:text-6xl font-bold leading-tight tracking-tight text-[var(--muted-foreground)]">
-            is on track.
-          </h1>
+          
+          {/* YTD Stats */}
+          <div>
+            <div className="text-sm text-[var(--muted-foreground)]">YTD Contributions</div>
+            <div className="text-3xl font-bold mt-1 text-green-600">
+              {formatCurrency(ytdContribution)}
+            </div>
+          </div>
         </div>
 
         {/* Main Content Grid */}
@@ -130,7 +161,7 @@ export default function Home() {
                 <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-bold">
                     {contributionType === "fixed" && "$"}
-                    {contributionValue}
+                    {currentValue}
                     {contributionType === "percent" && "%"}
                   </span>
                   <span className="text-[var(--muted-foreground)]">
@@ -148,13 +179,13 @@ export default function Home() {
                         min="0"
                         max="30"
                         step="1"
-                        value={contributionValue}
-                        onChange={(e) => setContributionValue(Number(e.target.value))}
+                        value={percentValue}
+                        onChange={(e) => setPercentValue(Number(e.target.value))}
                         className="w-full h-3 rounded-lg appearance-none cursor-pointer"
                         style={{
-                          background: contributionValue >= 6
-                            ? `linear-gradient(to right, #10b981 0%, #10b981 ${(contributionValue / 30) * 100}%, #E8E4D9 ${(contributionValue / 30) * 100}%, #E8E4D9 100%)`
-                            : `linear-gradient(to right, #fbbf24 0%, #fbbf24 ${(contributionValue / 30) * 100}%, #E8E4D9 ${(contributionValue / 30) * 100}%, #E8E4D9 100%)`
+                          background: percentValue >= 6
+                            ? `linear-gradient(to right, #10b981 0%, #10b981 ${(percentValue / 30) * 100}%, #E8E4D9 ${(percentValue / 30) * 100}%, #E8E4D9 100%)`
+                            : `linear-gradient(to right, #fbbf24 0%, #fbbf24 ${(percentValue / 30) * 100}%, #E8E4D9 ${(percentValue / 30) * 100}%, #E8E4D9 100%)`
                         }}
                       />
                       
@@ -180,7 +211,7 @@ export default function Home() {
                     </div>
 
                     {/* Dynamic Feedback Message */}
-                    {contributionValue < 6 ? (
+                    {percentValue < 6 ? (
                       <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                         <svg className="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -190,7 +221,7 @@ export default function Home() {
                             Missing employer match
                           </div>
                           <div className="text-xs text-amber-700">
-                            Increase to 6% to get an extra ${((120000 * 0.06 * 0.5) - (120000 * (contributionValue / 100) * 0.5)).toLocaleString()} per year
+                            Increase to 6% to get an extra ${((120000 * 0.06 * 0.5) - (120000 * (percentValue / 100) * 0.5)).toLocaleString()} per year
                           </div>
                         </div>
                       </div>
@@ -216,8 +247,8 @@ export default function Home() {
                 {contributionType === "fixed" && (
                   <input
                     type="number"
-                    value={contributionValue}
-                    onChange={(e) => setContributionValue(Number(e.target.value))}
+                    value={fixedValue}
+                    onChange={(e) => setFixedValue(Number(e.target.value))}
                     className="w-full h-12 px-4 border border-[var(--border)] rounded-lg bg-stone-50 text-lg"
                     placeholder="Enter amount"
                   />
@@ -254,8 +285,8 @@ export default function Home() {
                     ${(() => {
                       const annualContribution =
                         contributionType === "percent"
-                          ? 120000 * (contributionValue / 100)
-                          : contributionValue * 12;
+                          ? 120000 * (percentValue / 100)
+                          : fixedValue * 12;
                       const matchCap = 120000 * 0.06;
                       const matchableAmount = Math.min(annualContribution, matchCap);
                       return (matchableAmount * 0.5).toLocaleString();
@@ -282,7 +313,7 @@ export default function Home() {
               {/* Chart Container */}
               <div className="flex-1 min-h-[400px]">
                 <ContributionChart 
-                  contributionValue={contributionValue}
+                  contributionValue={currentValue}
                   contributionType={contributionType}
                 />
               </div>
@@ -297,7 +328,7 @@ export default function Home() {
                   <div className="text-xs text-[var(--muted-foreground)] mb-1">10-Year Projection</div>
                   <div className="text-lg font-bold">
                     {formatCurrency(
-                      calculateProjection(contributionValue, contributionType)[10]?.amount || 0
+                      calculateProjection(currentValue, contributionType)[10]?.amount || 0
                     )}
                   </div>
                 </div>
@@ -305,7 +336,7 @@ export default function Home() {
                   <div className="text-xs text-[var(--muted-foreground)] mb-1">Total Growth</div>
                   <div className="text-lg font-bold text-green-600">
                     +{formatCurrency(
-                      (calculateProjection(contributionValue, contributionType)[10]?.amount || 0) - 142893
+                      (calculateProjection(currentValue, contributionType)[10]?.amount || 0) - 142893
                     )}
                   </div>
                 </div>
@@ -317,6 +348,7 @@ export default function Home() {
         </div>
         {/* END OF GRID */}
       </main>
+      <Toaster position="bottom-right" />
     </div>
   );
 }
